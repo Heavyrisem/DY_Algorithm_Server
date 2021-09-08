@@ -14,4 +14,4 @@ RUN mkdir DY_Algorithm
 WORKDIR /DY_Algorithm
 COPY ./ ./
 
-ENTRYPOINT [ "sh START.sh" ]
+ENTRYPOINT [ "sh", "START.sh" ]
