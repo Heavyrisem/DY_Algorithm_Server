@@ -1,2 +1,1 @@
-cd $DIR
-timeout -s 9 $TIMEOUT $COMMAND
+timeout -s 9 $TIMEOUT sh ./COMMAND.sh
