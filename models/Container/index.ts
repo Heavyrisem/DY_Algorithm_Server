@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 import fs, { existsSync, mkdirSync } from 'fs';
 import path from 'path';
-import { ContainerOptions, LANGUAGETYPE } from '../../Types';
+import { ContainerOptions, DockerStartParameters, LANGUAGETYPE } from '../../Types';
 
 if (!existsSync(path.normalize(`${__dirname}/TEMP`))) mkdirSync(path.normalize(`${__dirname}/TEMP`), {recursive: true});
 
@@ -54,6 +54,12 @@ const Options: ContainerOptions = {
 
 export default {
     Run: (Options: ContainerOptions) => {
+        if (!Options.DOCKER_DIR) Options.DOCKER_DIR = '/DY_Algorithm';
+        if (!Options.HOST_DIR) Options.HOST_DIR = path.normalize(`${__dirname}/TEMP`);
+        if (!Options.DOCKER_IMAGE_NAME) Options.DOCKER_IMAGE_NAME = 'heavyrisem/dyalgorithm';
+
+
+        const DockerOptions: DockerStartParameters[] = [DockerStartParameters.AUTO_REMOVE, DockerStartParameters.DISABLE_NET];
         const CompilerDir = path.normalize(`${Options.HOST_DIR}/${Options.ID}`);
         if (!existsSync(CompilerDir)) mkdirSync(CompilerDir, {recursive: true});
     
@@ -78,17 +84,15 @@ export default {
         }
         fs.writeFileSync(path.normalize(`${CompilerDir}/${filename}`), Options.code);
     
-        const script = `docker run --rm -v ${CompilerDir}:${Options.DOCKER_DIR}/${Options.ID} -e TIMEOUT=${Options.TIMEOUT} -e DIR="${Options.DOCKER_DIR}/${Options.ID}" -e COMMAND="${command}" ${Options.DOCKER_IMAGE_NAME}`;
+        const script = `docker run ${DockerOptions.join(" ")} -v ${CompilerDir}:${Options.DOCKER_DIR}/${Options.ID} -e TIMEOUT=${Options.TIMEOUT} -e DIR="${Options.DOCKER_DIR}/${Options.ID}" -e COMMAND="${command}" ${Options.DOCKER_IMAGE_NAME}`;
         console.log(script);
     
-        let Result: {result?: string, error?: string} = {};
+        let Result: {stdout?: string, stderr?: string} = {};
         try {
-            Result.result = execSync(script, {stdio: 'pipe', timeout: 20000}).toString();
-            return Result;
+            Result.stdout = execSync(script, {stdio: 'pipe', timeout: 20000}).toString();
         } catch(err) {
-            Result.error = (err as any).stderr.toString();
-            return Result;
-        }
+            Result.stderr = (err as any).stderr.toString();
+        } finally { return Result }
     }
 }
 

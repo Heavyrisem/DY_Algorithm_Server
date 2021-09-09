@@ -1,25 +1,54 @@
-import { Request, Router } from "express";
+import { Request, Response, Router } from "express";
 import middleware, { AuthedRequest } from "../middleware/Auth";
 import Container from "../models/Container";
-import { LANGUAGETYPE } from "../Types";
+import { ContainerOptions, LANGUAGETYPE } from "../Types";
 
 const router = Router();
 
-interface CompileRequest extends AuthedRequest {
+export interface CompileRequest extends AuthedRequest {
     TYPE: LANGUAGETYPE
     code: string
-
+    Challenge_NO: number
 }
-router.post('/compile', middleware.CheckAuthed, (req: Request<any,any,CompileRequest>, res) => {
+export interface CompileResponse {
+    stdout?: string
+    stderr?: string
+}
+router.post('/', middleware.CheckAuthed, (req: Request<any,any,CompileRequest>, res: Response<CompileResponse>) => {
+    let Ret: CompileResponse = {};
     if (req.body.TYPE && req.body.code) {
-        const Options = {
+        let Options: ContainerOptions = {
             TYPE: req.body.TYPE,
             code: req.body.code,
             ID: req.body.U_ID,
-            
+            TIMEOUT: "0s"
         }
-        Container.Run()
+
+        try {
+            // Get Challenge info
+            Options.TIMEOUT = "3s";
+        } catch (err) {
+
+        }
+
+        try {
+            const Result = Container.Run(Options);
+            console.log(Result);
+            
+            if (Result.stdout) Ret.stdout = Result.stdout;
+            else Ret.stderr = Result.stderr;
+        } catch (err) {
+            console.log(err);
+            Ret.stderr = err + "";
+        } finally { return res.send(Ret) }
+    } else {
+        Ret.stderr = "입력 값이 잘못되었습니다.";
+        return res.send(Ret);
     }
 });
+
+router.get("/", (req, res) => {
+    res.send("Hello World");
+})
 
 export default router;
