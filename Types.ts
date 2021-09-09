@@ -1,5 +1,5 @@
 
-export interface CompilerOptions extends DockerOptions {
+export interface ContainerOptions extends DockerOptions {
     TYPE: LANGUAGETYPE
     code: string
 }
