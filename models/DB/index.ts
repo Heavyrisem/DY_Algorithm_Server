@@ -13,7 +13,7 @@ class DB {
     }
 
     async test() {
-        let tmp = await this.DB_Client.db().collection('Devices').findOne<{id: string}>({});
+        let tmp = await this.DB_Client.db().collection('Accounts').findOne<{id: string}>({});
         // if (tmp)
         //     console.log(tmp);
         // else console.log()
