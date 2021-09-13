@@ -67,21 +67,22 @@ export default {
         let command: string = "";
         switch (Options.TYPE) {
             case LANGUAGETYPE.NODEJS: {
-                filename = `./${Options.ID}.js`;
+                filename = `${Options.ID}.js`;
                 command = `${LANGUAGETYPE.NODEJS} ${filename}`;
                 break;
             }
             case LANGUAGETYPE.PYTHON3: {
-                filename = `./${Options.ID}.py`;
+                filename = `${Options.ID}.py`;
                 command = `${LANGUAGETYPE.PYTHON3} ${filename}`;
                 break;
             }
             case LANGUAGETYPE.C: {
-                filename = `./${Options.ID}.c`;
-                command = `sh ${Options.DOCKER_DIR}/gcc.sh USER_ID`;
+                filename = `${Options.ID}.c`;
+                command = `sh ${Options.DOCKER_DIR}/gcc.sh ${Options.ID}`;
                 break;
             }
         }
+        console.log("Write file to", CompilerDir, filename);
         fs.writeFileSync(path.normalize(`${CompilerDir}/${filename}`), Options.code);
     
         const script = `docker run ${DockerOptions.join(" ")} -v ${CompilerDir}:${Options.DOCKER_DIR}/${Options.ID} -e TIMEOUT=${Options.TIMEOUT} -e DIR="${Options.DOCKER_DIR}/${Options.ID}" -e COMMAND="${command}" ${Options.DOCKER_IMAGE_NAME}`;

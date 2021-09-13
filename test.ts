@@ -10,14 +10,24 @@ console.log("Hello World From Node.js");
 const Py_code = `
 print("Hello World From Python")
 `;
+const C_code = `
+#include <stdio.h>
+
+int main() {
+    printf("Hello World\\n");
+    printf("C is running in Docker Container\\n");
+    printf("This is Docker Container\\n");
+    return 0;
+}
+`;
 
 (async() => {
     const Req: CompileRequest = {
         // U_ID: "USER_ID",
         U_Token: "1234",
-        code: Py_code,
+        code: C_code,
         Challenge_NO: 1,
-        TYPE: LANGUAGETYPE.PYTHON3
+        TYPE: LANGUAGETYPE.C
     }
     const ServerResponse: AxiosResponse<CompileResponse> = await axios.post("http://localhost/compiler", Req, {
         headers: {"Content-Type": "application/json"}
@@ -34,7 +44,7 @@ print("Hello World From Python")
 //         U_Email: "test@email.com",
 //         U_Nickname: "USER_NICK"
 //     };
-//     const ServerResponse: AxiosResponse<Login_Model_Return_T> = await axios.post("http://localhost/account/register", Req);
+//     const ServerResponse: AxiosResponse<Login_Model_Return_T> = await axios.post("http://localhost/account/login", Req);
 
 //     if (ServerResponse.data) console.log(ServerResponse.data);
 // })();
