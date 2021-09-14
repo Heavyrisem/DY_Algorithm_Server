@@ -1,6 +1,8 @@
 import express from 'express';
 
 import middleware from './middleware/Default';
+import cors from 'cors';
+
 import './models/DB';
 
 
@@ -9,6 +11,7 @@ import AccountRoute from './routes/Accounts';
 
 const Server = express();
 
+Server.use(cors());
 Server.use(middleware.Parser);
 
 Server.use('/compiler', ContainerRoute);
