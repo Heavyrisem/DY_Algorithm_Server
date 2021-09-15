@@ -39,9 +39,10 @@ router.post('/register', async (req: Request<any,any,RegisterRequest>, res: Resp
 export interface LoginResponse {
     success: boolean
     U_Token?: string
+    U_Nickname?: string
     reason?: string
 }
-router.post('/login', async (req: Request<any,any,Login_Model_Param_T>, res: Response) => {
+router.post('/login', async (req: Request<any,any,Login_Model_Param_T>, res: Response<LoginResponse>) => {
     let Ret: LoginResponse = { success: false };
     try {
         if (req.body.U_ID && req.body.U_PW) {
@@ -49,6 +50,7 @@ router.post('/login', async (req: Request<any,any,Login_Model_Param_T>, res: Res
 
             Ret.success = true;
             Ret.U_Token = loginResult.U_Token;
+            Ret.U_Nickname = loginResult.U_Nickname;
             return res.send(Ret);
         } else throw new Error("잘못된 입력값 입니다.");
     } catch (err) {
