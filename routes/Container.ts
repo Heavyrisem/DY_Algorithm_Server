@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import middleware, { AuthedRequest } from "../middleware/Auth";
 import Container from "../models/Container";
+import { Account_DB } from "../models/DB/DB_Types";
 import { ContainerOptions, LANGUAGETYPE } from "../Types";
 
 const router = Router();
@@ -14,13 +15,13 @@ export interface CompileResponse {
     stdout?: string
     stderr?: string
 }
-router.post('/', middleware.CheckAuthed, (req: Request<any,any,CompileRequest>, res: Response<CompileResponse>) => {
+router.post('/', middleware.CheckAuthed, (req: Request<Account_DB,any,CompileRequest>, res: Response<CompileResponse>) => {
     let Ret: CompileResponse = {};
     if (req.body.TYPE && req.body.code) {
         let Options: ContainerOptions = {
             TYPE: req.body.TYPE,
             code: req.body.code,
-            ID: req.body.U_Token,
+            ID: req.params.U_ID,
             TIMEOUT: "0s"
         }
 

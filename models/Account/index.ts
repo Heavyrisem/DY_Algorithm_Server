@@ -2,6 +2,7 @@ import DB from '../DB';
 import { Account_DB } from "../DB/DB_Types";
 
 import UIDGenerator  from 'uid-generator';
+import crypto from 'crypto';
 
 export interface Register_Model_T {
     U_ID: string
@@ -30,7 +31,7 @@ export default {
                     const uidgen = new UIDGenerator(512, UIDGenerator.BASE62);
                     const UserData: Account_DB = {
                         U_ID: Info.U_ID,
-                        U_PW: Info.U_PW,
+                        U_PW: crypto.createHash('sha512').update(Info.U_PW).digest('base64'),
                         U_Nickname: Info.U_Nickname,
                         U_Email: Info.U_Email,
                         U_Token: await uidgen.generate()
@@ -49,8 +50,9 @@ export default {
         return new Promise(async (resolve, reject) => {
             try {
                 const db = await DB.GetConnection();
+                Info.U_PW = crypto.createHash('sha512').update(Info.U_PW).digest('base64');
                 let UsrAccount = await db.collection('Accounts').findOne<Account_DB>(Info);
-
+                console.log(Info, UsrAccount);
                 if (!UsrAccount) return reject("등록되지 않은 계정입니다. 회원가입을 진행해 주세요");
                 let Ret: Login_Model_Return_T = {
                     U_ID: UsrAccount.U_ID,
@@ -63,17 +65,17 @@ export default {
             }
         })
     },
-    CheckToken: (Token: string): Promise<boolean> => {
+    CheckToken: (Token: string): Promise<Account_DB | undefined> => {
         return new Promise(async (resolve, reject) => {
             try {
                 const db = await DB.GetConnection();
                 let Account = await db.collection('Accounts').findOne<Account_DB>({U_Token: Token});
 
-                if (Account) return resolve(true);
-                else return resolve(false);
+                if (Account) return resolve(Account);
+                else return resolve(undefined);
             } catch (err) {
                 console.log("middleware token", err);
-                return resolve(false);
+                return resolve(undefined);
             }
         })
     }

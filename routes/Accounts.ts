@@ -16,21 +16,23 @@ export interface RegisterRequest {
 export interface RegisterResponse {
     success: boolean
     U_Token?: string
+    U_Nickname?: string
     reason?: string
 }
 router.post('/register', async (req: Request<any,any,RegisterRequest>, res: Response<RegisterResponse>) => {
     let Ret: RegisterResponse = { success: false };
     try {
+        console.log(req.body);
         if (req.body.U_Email && req.body.U_ID && req.body.U_Nickname && req.body.U_PW) {
             const registerResult = await Account.Register(req.body as Register_Model_T);
 
             Ret.success = true;
             Ret.U_Token = registerResult.U_Token;
+            Ret.U_Nickname = registerResult.U_Nickname;
             res.send(Ret);
         } else throw new Error("잘못된 입력값 입니다.");
     } catch (err) {
-        console.log(err);
-        Ret.reason = err as string;
+        Ret.reason = err+"";
         return res.send(Ret);
     }
 })
@@ -54,8 +56,8 @@ router.post('/login', async (req: Request<any,any,Login_Model_Param_T>, res: Res
             return res.send(Ret);
         } else throw new Error("잘못된 입력값 입니다.");
     } catch (err) {
-        console.log(err);
-        Ret.reason = err as string;
+        // console.log(err+"");
+        Ret.reason = err+"";
         return res.send(Ret);
     }
 })
